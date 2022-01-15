@@ -37,8 +37,10 @@ if engine.ActiveGamemode() == "terrortown" then
     end)
 
     hook.Add("Initialize", "BeeWinInitialize", function()
-        WIN_BEE = GenerateNewWinID and GenerateNewWinID(ROLE_NONE) or 234
-        SetGlobalInt("WIN_BEE", WIN_BEE)
+        if not CRVersion("1.4.6") or SERVER then
+            WIN_BEE = GenerateNewWinID and GenerateNewWinID(ROLE_NONE) or 234
+            SetGlobalInt("WIN_BEE", WIN_BEE)
+        end
 
         if CLIENT then
             LANG.AddToLanguage("english", "win_bee", "The bees have stung their way to a win!")
