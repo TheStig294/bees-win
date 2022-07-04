@@ -3,36 +3,30 @@ if engine.ActiveGamemode() == "terrortown" then
 
     CreateConVar("ttt_bees_win_death_link", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY}, "Whether the bees should win through a death link kill", 0, 1)
 
-    hook.Add("PreRegisterSWEP", "BeeWinDeathLink", function(SWEP, class)
-        if class == "weapon_ttt_death_link" then
-            function playerDeath(victim, inflictor, attacker)
-                if (not SERVER) then return end
-                if (victim == attacker or victim:GetNWBool("deathlink_used", false)) then return end
-                local ent = victim:GetNWEntity("deathlinked_player", nil)
+    hook.Add("PlayerDeath", "ttt_death_link_hook", function(victim, inflictor, attacker)
+        if (not SERVER) then return end
+        if (victim == attacker or victim:GetNWBool("deathlink_used", false)) then return end
+        local ent = victim:GetNWEntity("deathlinked_player", nil)
 
-                if (IsValid(ent)) then
-                    ent:SetNWEntity("deathlinked_player", nil)
-                    victim:SetNWEntity("deathlinked_player", nil)
-                    local explosion = ents.Create("env_explosion")
-                    explosion:SetPos(ent:GetPos())
-                    explosion:SetOwner(victim)
-                    explosion:SetKeyValue("iMagnitude", 180)
-                    explosion:SetKeyValue("rendermode", "4")
-                    explosion:Spawn()
-                    explosion:Fire("Explode", "", 0)
-                    explosion:EmitSound("siege/big_explosion.wav", 500, 500)
-                    local effect = EffectData()
-                    effect:SetOrigin(ent:GetPos())
-                    util.Effect("Explosion_2_FireSmoke", effect)
+        if (IsValid(ent)) then
+            ent:SetNWEntity("deathlinked_player", nil)
+            victim:SetNWEntity("deathlinked_player", nil)
+            local explosion = ents.Create("env_explosion")
+            explosion:SetPos(ent:GetPos())
+            explosion:SetOwner(victim)
+            explosion:SetKeyValue("iMagnitude", 180)
+            explosion:SetKeyValue("rendermode", "4")
+            explosion:Spawn()
+            explosion:Fire("Explode", "", 0)
+            explosion:EmitSound("siege/big_explosion.wav", 500, 500)
+            local effect = EffectData()
+            effect:SetOrigin(ent:GetPos())
+            util.Effect("Explosion_2_FireSmoke", effect)
 
-                    timer.Simple(1, function()
-                        ent:SetNWBool("deathlink_used", true)
-                        victim:SetNWBool("deathlink_used", true)
-                    end)
-                end
-            end
-
-            hook.Add("PlayerDeath", "ttt_death_link_hook", playerDeath)
+            timer.Simple(1, function()
+                ent:SetNWBool("deathlink_used", true)
+                victim:SetNWBool("deathlink_used", true)
+            end)
         end
     end)
 
@@ -69,16 +63,19 @@ if engine.ActiveGamemode() == "terrortown" then
         end)
 
         hook.Add("TTTCheckForWin", "BeeWinCheck", function()
-            local bees_win = true
-
-            for _, p in ipairs(player.GetAll()) do
-                if (p:Alive() and not p:IsSpec()) or (p:GetNWBool("UsedSuicideBomb") and not GetConVar("ttt_bees_win_suicide_bomb"):GetBool()) or (not p:GetNWBool("deathlink_used", true) and not GetConVar("ttt_bees_win_death_link"):GetBool()) then
-                    bees_win = false
-                    break
-                end
+            for _, ply in ipairs(player.GetAll()) do
+                -- No bees win if...
+                -- There's a player still alive
+                if ply:Alive() and not ply:IsSpec() then return end
+                -- Someone recently used the suicide bomb, and the bees win with it isn't turned on
+                if ply:GetNWBool("UsedSuicideBomb") and not GetConVar("ttt_bees_win_suicide_bomb"):GetBool() then return end
+                -- Someone used the death link weapon, and the bees win with it isn't turned on
+                if not ply:GetNWBool("deathlink_used", true) and not GetConVar("ttt_bees_win_death_link"):GetBool() then return end
+                -- Someone is in the process of respawning with the second chance item
+                if ply.NOWINASC then return end
             end
 
-            if bees_win then return WIN_BEE end
+            return WIN_BEE
         end)
     end
 
