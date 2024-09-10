@@ -14,7 +14,8 @@ Use the following to turn back on certain weapons triggering a bees win:\
 *ttt_bees_win_death_link 1*
 
 ## Credit
-All credit goes to [url=https://steamcommunity.com/id/malivil/]Malivil[/url] for making custom round reports possible, as well as the code of this mod. (Except for the jihad bomb and death link compatibility, which was made by me)
+All credit goes to [Malivil](https://github.com/Malivil) for making custom round reports possible, as well as the initial code of this mod.\
+(I added compatibility with certain buyable weapons, convars to toggle this, compatibility with new updates to Custom Roles, and added support for passive win/jester roles being the last players alive)
 
 ## Steam Workshop Link
 https://steamcommunity.com/sharedfiles/filedetails/?id=2607884131
