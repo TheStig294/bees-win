@@ -1,4 +1,4 @@
-# Bees Win
+# Ties are Bees Win
 ## This mod only works with [Custom Roles for TTT](https://steamcommunity.com/workshop/filedetails/?id=2421039084)
 
 This mod re-adds the "bees win", which happens whenever everyone dies at the same time in a round of TTT! (Instead of a traitor win)\
