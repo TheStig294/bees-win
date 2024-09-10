@@ -4,11 +4,11 @@ if engine.ActiveGamemode() == "terrortown" then
     CreateConVar("ttt_bees_win_death_link", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY}, "Whether the bees should win through a death link kill", 0, 1)
 
     hook.Add("PlayerDeath", "ttt_death_link_hook", function(victim, inflictor, attacker)
-        if (not SERVER) then return end
-        if (victim == attacker or victim:GetNWBool("deathlink_used", false)) then return end
+        if not SERVER then return end
+        if victim == attacker or victim:GetNWBool("deathlink_used", false) then return end
         local ent = victim:GetNWEntity("deathlinked_player", nil)
 
-        if (IsValid(ent)) then
+        if IsValid(ent) then
             ent:SetNWEntity("deathlinked_player", nil)
             victim:SetNWEntity("deathlinked_player", nil)
             local explosion = ents.Create("env_explosion")
@@ -31,7 +31,7 @@ if engine.ActiveGamemode() == "terrortown" then
     end)
 
     hook.Add("Initialize", "BeeWinInitialize", function()
-        if not CRVersion("1.4.6") or SERVER then
+        if SERVER then
             WIN_BEE = GenerateNewWinID and GenerateNewWinID(ROLE_NONE) or 234
             SetGlobalInt("WIN_BEE", WIN_BEE)
         end
@@ -65,8 +65,8 @@ if engine.ActiveGamemode() == "terrortown" then
         hook.Add("TTTCheckForWin", "BeeWinCheck", function()
             for _, ply in ipairs(player.GetAll()) do
                 -- No bees win if...
-                -- There's a player still alive
-                if ply:Alive() and not ply:IsSpec() then return end
+                -- There's a player still alive and they're not a passive win role
+                if ply:Alive() and not ply:IsSpec() and not ply:IsJesterTeam() and not ROLE_HAS_PASSIVE_WIN[ply:GetRole()] and ply:GetRole() ~= ROLE_CUPID then return end
                 -- Someone recently used the suicide bomb, and the bees win with it isn't turned on
                 if ply:GetNWBool("UsedSuicideBomb") and not GetConVar("ttt_bees_win_suicide_bomb"):GetBool() then return end
                 -- Someone used the death link weapon, and the bees win with it isn't turned on
