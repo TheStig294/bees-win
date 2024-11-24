@@ -62,13 +62,11 @@ if engine.ActiveGamemode() == "terrortown" then
             end
         end)
 
-        local soloWinJesters = {ROLE_CUPID, ROLE_FRENCHMAN}
-
         hook.Add("TTTCheckForWin", "BeeWinCheck", function()
             for _, ply in player.Iterator() do
                 -- No bees win if...
                 -- There's a player still alive and they're not a passive win role
-                if ply:Alive() and not ply:IsSpec() and not ply:IsJesterTeam() and not ROLE_HAS_PASSIVE_WIN[ply:GetRole()] and not table.HasValue(soloWinJesters, ply:GetRole()) then return end
+                if ply:Alive() and not ply:IsSpec() and not ply:IsJesterTeam() and not ROLE_HAS_PASSIVE_WIN[ply:GetRole()] then return end
                 -- Someone recently used the suicide bomb, and the bees win with it isn't turned on
                 if ply:GetNWBool("UsedSuicideBomb") and not GetConVar("ttt_bees_win_suicide_bomb"):GetBool() then return end
                 -- Someone used the death link weapon, and the bees win with it isn't turned on
